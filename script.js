@@ -17,6 +17,9 @@ let startTime = 0;
 let endTime = 0;
 let timeBonus = 0;
 
+const correctSound = new Audio('correct.mp3');
+const wrongSound = new Audio('wrong.mp3');
+
 function getLetterGrade(score) {
   if (score >= 90) return "A";
   if (score >= 80) return "B";
@@ -32,6 +35,7 @@ let questions = [
       { text: '3', correct: false },
       { text: '4', correct: true },
       { text: '5', correct: false },
+      { text: '6', correct: false }
     ]
   },
   {
@@ -40,6 +44,7 @@ let questions = [
       { text: 'Berlin', correct: false },
       { text: 'Madrid', correct: false },
       { text: 'Paris', correct: true },
+      { text: 'Rome', correct: false }
     ]
   },
   {
@@ -48,6 +53,7 @@ let questions = [
       { text: 'Earth', correct: false },
       { text: 'Jupiter', correct: true },
       { text: 'Mars', correct: false },
+      { text: 'Venus', correct: false }
     ]
   },
   {
@@ -56,6 +62,7 @@ let questions = [
       { text: 'Oxygen', correct: true },
       { text: 'Osmium', correct: false },
       { text: 'Ozone', correct: false },
+      { text: 'Gold', correct: false }
     ]
   },
   {
@@ -64,6 +71,7 @@ let questions = [
       { text: '6', correct: false },
       { text: '8', correct: true },
       { text: '10', correct: false },
+      { text: '12', correct: false }
     ]
   },
   {
@@ -72,6 +80,7 @@ let questions = [
       { text: 'William Shakespeare', correct: true },
       { text: 'Jane Austen', correct: false },
       { text: 'Charles Dickens', correct: false },
+      { text: 'Mark Twain', correct: false }
     ]
   },
   {
@@ -80,6 +89,7 @@ let questions = [
       { text: 'Asia', correct: false },
       { text: 'Africa', correct: true },
       { text: 'South America', correct: false },
+      { text: 'Europe', correct: false }
     ]
   },
   {
@@ -88,6 +98,7 @@ let questions = [
       { text: 'CO2', correct: false },
       { text: 'H2O', correct: true },
       { text: 'O2', correct: false },
+      { text: 'H2', correct: false }
     ]
   },
   {
@@ -96,6 +107,7 @@ let questions = [
       { text: 'USA', correct: false },
       { text: 'Australia', correct: true },
       { text: 'Brazil', correct: false },
+      { text: 'India', correct: false }
     ]
   },
   {
@@ -104,6 +116,7 @@ let questions = [
       { text: 'George Washington', correct: true },
       { text: 'Abraham Lincoln', correct: false },
       { text: 'Thomas Jefferson', correct: false },
+      { text: 'John Adams', correct: false }
     ]
   }
 ];
@@ -141,27 +154,37 @@ function showNextQuestion() {
   question.answers.forEach(answer => {
     const button = document.createElement('button');
     button.textContent = answer.text;
-    button.onclick = () => handleAnswer(answer);
+    button.classList.add('answer-btn');
+    button.onclick = () => handleAnswer(button, answer);
     answersContainer.appendChild(button);
   });
 }
 
-function handleAnswer(answer) {
+function handleAnswer(button, answer) {
+  document.querySelectorAll('.answer-btn').forEach(btn => {
+    btn.disabled = true;
+    const selectedAnswer = questions[currentQuestionIndex].answers.find(a => a.text === btn.textContent);
+    btn.style.backgroundColor = selectedAnswer.correct ? 'green' : 'red';
+  });
+
   if (answer.correct) {
+    correctSound.play();
     score += 8;
     correctAnswers++;
   } else {
+    wrongSound.play();
     score -= 5;
     incorrectAnswers++;
   }
   
-  currentQuestionIndex++;
-  
-  if (currentQuestionIndex >= questions.length) {
-    endGame();
-  } else {
-    showNextQuestion();
-  }
+  setTimeout(() => {
+    currentQuestionIndex++;
+    if (currentQuestionIndex >= questions.length) {
+      endGame();
+    } else {
+      showNextQuestion();
+    }
+  }, 1000);
 }
 
 function endGame() {
